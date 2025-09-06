@@ -167,7 +167,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 Autor
 
-**Francisco** - *Desarrollo inicial* - [Tu GitHub](https://github.com/tu-usuario)
+**Francisco** - *Desarrollo inicial* - [Tu GitHub](https://github.com/ranserott)
 
 ## 🙏 Agradecimientos
 
@@ -180,6 +180,6 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ⭐ **¡Si te gusta este proyecto, dale una estrella!** ⭐
 
-📧 **Contacto**: tu-email@ejemplo.com
+📧 **Contacto**: francisco.cerda.escobar@gmail.com
 
-🌐 **Demo**: [Ver demo en vivo](https://tu-demo.com)
+🌐 **Demo**: [Ver demo en vivo](https://bytea.cl/portafolio/conduc/index.php)
