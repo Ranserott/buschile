@@ -1,0 +1,128 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: bus_reservation_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json
+        coverage: none
+    
+    - name: Validate composer.json and composer.lock
+      run: |
+        if [ -f composer.json ]; then
+          composer validate --strict
+        fi
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+    
+    - name: Install dependencies
+      run: |
+        if [ -f composer.json ]; then
+          composer install --prefer-dist --no-progress
+        fi
+    
+    - name: Setup test database
+      run: |
+        mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS bus_reservation_test;"
+        mysql -h 127.0.0.1 -u root -proot bus_reservation_test < database/schema.sql
+    
+    - name: Copy environment file
+      run: |
+        cp config/database.example.php config/database.php
+        sed -i 's/tu_usuario/root/g' config/database.php
+        sed -i 's/tu_contraseña/root/g' config/database.php
+        sed -i 's/bus_reservation/bus_reservation_test/g' config/database.php
+    
+    - name: Run PHP syntax check
+      run: |
+        find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+    
+    - name: Run basic functionality test
+      run: |
+        php -S localhost:8000 &
+        sleep 2
+        curl -f http://localhost:8000/index.php || exit 1
+        echo "✅ Basic functionality test passed"
+    
+    - name: Check code style (if PHP_CodeSniffer is available)
+      run: |
+        if command -v phpcs &> /dev/null; then
+          phpcs --standard=PSR12 --ignore=vendor/ .
+        else
+          echo "⚠️ PHP_CodeSniffer not available, skipping code style check"
+        fi
+      continue-on-error: true
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run security scan
+      run: |
+        # Buscar patrones de seguridad básicos
+        echo "🔍 Scanning for potential security issues..."
+        
+        # Verificar que no hay credenciales hardcodeadas
+        if grep -r "password.*=.*['\"][^'\"]*['\"]" --include="*.php" --exclude-dir=vendor . | grep -v "password.*=.*''\|password.*=.*\"\""; then
+          echo "❌ Potential hardcoded passwords found"
+          exit 1
+        fi
+        
+        # Verificar uso de funciones inseguras
+        if grep -r "eval\|exec\|system\|shell_exec" --include="*.php" --exclude-dir=vendor .; then
+          echo "⚠️ Potentially dangerous functions found"
+        fi
+        
+        echo "✅ Basic security scan completed"
+
+  deploy:
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deployment would happen here"
+        echo "This is where you would add your deployment scripts"
+        echo "For example: rsync, FTP upload, or cloud deployment"
+        
+        # Ejemplo de comandos de deployment:
+        # rsync -avz --exclude 'config/database.php' ./ user@server:/path/to/app/
+        # ssh user@server 'cd /path/to/app && php install.php'
+        
+        echo "✅ Deployment completed successfully"
