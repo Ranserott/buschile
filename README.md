@@ -167,14 +167,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 Autor
 
-**Francisco** - *Desarrollo inicial* - [Tu GitHub](https://github.com/ranserott)
-
-## 🙏 Agradecimientos
-
-- Bootstrap por el framework CSS
-- Font Awesome por los iconos
-- La comunidad PHP por las mejores prácticas
-- Todos los contribuidores del proyecto
+**Francisco Cerda Escobar** - *Desarrollo inicial* - [GitHub](https://github.com/ranserott)
 
 ---
 
