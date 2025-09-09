@@ -47,7 +47,7 @@ Hay muchas formas de contribuir a BusChile:
 
 2. **Configura el upstream**
    ```bash
-   git remote add upstream https://github.com/USUARIO_ORIGINAL/buschile.git
+   git remote add upstream https://github.com/Ranserott/buschile.git
    ```
 
 3. **Configura la base de datos**
